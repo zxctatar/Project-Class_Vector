@@ -1,7 +1,6 @@
 ﻿#include "cout.h"
 #include "Vector.h"
 #include <iostream>
-#include <vector>
 
 int main()
 {
