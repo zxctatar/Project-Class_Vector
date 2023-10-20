@@ -47,20 +47,23 @@ private:
 public:
 
 	// a()
-	Vector<T>() : _capacity(0), _size(0), vec(new T[_capacity]) {}
+	Vector<T>() : _capacity(0), _size(0), vec(new T[_capacity]) { std::lock_guard<std::mutex> lock(mtx); }
 
 	// a(1)
 	Vector(const T v) : _capacity(1), _size(1), vec(new T[_capacity]) {
+		std::lock_guard<std::mutex> lock(mtx);
 		vec[0] = v;
 	}
 
 	// a{1,2,3,...)
 	Vector(const std::initializer_list<T>& v) : _capacity(v.size()), _size(v.size()), vec(new T[_capacity]) {
+		std::lock_guard<std::mutex> lock(mtx);
 		std::copy(v.begin(), v.end(), vec);
 	}
 
 	// a(b)
 	Vector(const Vector<T>& other) : _capacity(other._capacity), _size(other._size), vec(new T[_capacity]) {
+		std::lock_guard<std::mutex> lock(mtx);
 		for (int i = 0; i < _capacity; ++i) {
 			vec[i] = other.vec[i];
 		}
@@ -68,21 +71,25 @@ public:
 
 	// a(std::move(b))
 	Vector(Vector<T>&& other) noexcept : _capacity(other._capacity), _size(other._size), vec(new T[_capacity]) {
+		std::lock_guard<std::mutex> lock(mtx);
 		vec = other.vec;
 		other.vec = nullptr;
 	}
 
 	Vector(const size_t& sz, const T& val) : _capacity(sz), _size(sz), vec(new T[_capacity]) {
+		std::lock_guard<std::mutex> lock(mtx);
 		for (int i = 0; i < _capacity; ++i) {
 			vec[i] = val;
 		}
 	}
 
 	size_t size() {
+		std::lock_guard<std::mutex> lock(mtx);
 		return _size;
 	}
 
 	size_t capacity() {
+		std::lock_guard<std::mutex> lock(mtx);
 		return _capacity;
 	}
 
@@ -95,26 +102,32 @@ public:
 	}
 
 	T& front() const {
+		std::lock_guard<std::mutex> lock(mtx);
 		return vec[0];
 	}
 
 	T& back() const {
+		std::lock_guard<std::mutex> lock(mtx);
 		return vec[_size - 1];
 	}
 
 	T* data() const {
+		std::lock_guard<std::mutex> lock(mtx);
 		return vec;
 	}
 
 	bool empty() {
+		std::lock_guard<std::mutex> lock(mtx);
 		return _size;
 	}
 
 	_it<T> begin() {
+		std::lock_guard<std::mutex> lock(mtx);
 		return _it<T>(vec);
 	}
 
 	_it<T> end() {
+		std::lock_guard<std::mutex> lock(mtx);
 		return _it<T>(vec + _size);
 	}
 
@@ -375,6 +388,7 @@ public:
 	}
 
 	T& operator[](const size_t& index) {
+		std::lock_guard<std::mutex> lock(mtx);
 		if (index >= _size) {
 			throw std::out_of_range("Index out of bounds");
 		}
